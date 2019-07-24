@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mysiteforme.admin.monitor.dao.HostDao" >
+    <!-- 这儿定义一个resultMap -->
+    <resultMap type="com.mysiteforme.admin.monitor.entity.Host" id="HostMap">
+        <id property="id" column="id"/>
+        <result property="hostDeviceId" column="host_device_id"/>
+        <result property="mainboardId" column="mainboard_id"/>
+        <result property="model" column="model"/>
+        <result property="modelName" column="model_name"/>
+        <result property="manufactureDate" column="manufacture_date"/>
+        <result property="installBy" column="install_by"/>
+        <result property="installName" column="install_name"/>
+        <result property="installDate"  column="install_date"/>
+        <result property="customerId"  column="customer_id"/>
+        <result property="customerName"  column="name"/>
+        <result property="status" column="status"/>
+        <result property="statusName" column="status_name"/>
+        <result property="remarks" column="remarks"/>
+        <result property="delFlag" column="del_flag"/>
+    </resultMap>
+
+    <select id="selectHostByMap" resultMap="HostMap"  parameterType="java.util.Map">
+        SELECT
+        dh.id,
+        dh.host_device_id,
+        dh.mainboard_id,
+        dh.model,
+        (select sd.label from sys_dict sd where sd.value = dh.model) as model_name,
+        dh.manufacture_date,
+        dh.install_by,
+        dh.install_date,
+        dh.customer_id,
+        dh.status,
+        (select sd.label from sys_dict sd where sd.value = dh.status) as status_name,
+        dh.remarks,
+        dh.del_flag,
+        sc.name     	AS 	"name",
+        (select su.nick_name from sys_user su where su.id = dh.install_by)	AS	"install_name"
+        from
+        dev_host dh
+        left join sys_customer  sc  	on  	sc.id = dh.customer_id
+        where
+        1=1
+        <if test="id == 0 or id == null">
+            and dh.del_flag = false
+            and sc.del_flag = false
+        </if>
+        <if test="hostDeviceId !=null and hostDeviceId !=''">
+            and dh.host_device_id = #{hostDeviceId}
+        </if>
+        <if test="customerName !=null and customerName !=''">
+            and sc.name = #{customerName}
+        </if>
+        <if test="model !=null and model !=''">
+            and dh.model 	= #{model}
+        </if>
+        <if test="status !=null and status !=''">
+            and dh.status 	= #{status}
+        </if>
+        <if test="address !=null and address !=''">
+            and dh.address LIKE '%#{address}%'
+        </if>
+        <if test="id != 0 and id != null">
+            and u.id = #{id}
+        </if>
+    </select>
+
+</mapper>

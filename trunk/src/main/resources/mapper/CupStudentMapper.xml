@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- DEV_CUP_STUDENT -->
+<mapper namespace="com.mysiteforme.admin.monitor.dao.CupStudentDao">
+    <!-- 字段映射 -->
+    <resultMap id="CupStudentMap" type="com.mysiteforme.admin.monitor.entity.CupStudent">
+        <id column="ID" property="id" jdbcType="BIGINT" />
+        <result column="CUP_CODE" property="cupCode" jdbcType="VARCHAR" />
+        <result column="NAME" property="name" jdbcType="VARCHAR" />
+        <result column="SEX" property="sex" jdbcType="VARCHAR" />
+        <result column="BIRTHDAY" property="birthday" jdbcType="TIMESTAMP" />
+        <result column="HEIGHT" property="height" jdbcType="VARCHAR" />
+        <result column="WEIGHT" property="weight" jdbcType="VARCHAR" />
+        <result column="CREATE_BY" property="createBy" jdbcType="BIGINT" />
+        <result column="CREATE_DATE" property="createDate" jdbcType="TIMESTAMP" />
+        <result column="UPDATE_BY" property="updateBy" jdbcType="BIGINT" />
+        <result column="UPDATE_DATE" property="updateDate" jdbcType="TIMESTAMP" />
+        <result column="REMARKS" property="remarks" jdbcType="VARCHAR" />
+        <result column="DEL_FLAG" property="delFlag" jdbcType="VARCHAR" />
+    </resultMap>
+    <resultMap id="Grades" type="java.lang.String">
+        <result property="grade" column="grade"/>
+    </resultMap>
+
+    <select id="selectListByMap" resultMap="Grades" parameterType="java.util.Map">
+        select
+        dpm.grade
+        from
+        host h,
+        dev_pipeline_machine dpm
+        where
+        1 = 1
+        <if test="customerId != null and customerId !=''">
+            and h.customer_id = '#{customerId}'
+        </if>
+        order by type desc
+    </select>
+
+
+    <!-- 表所有字段 -->
+    <sql id="allColumns">
+        ID, CUP_CODE, NAME, SEX, BIRTHDAY, HEIGHT, WEIGHT, CREATE_BY, 
+        CREATE_DATE, UPDATE_BY, UPDATE_DATE, REMARKS, DEL_FLAG
+    </sql>
+
+    <!-- 查询所有数据 -->
+    <select id="findCupStudentAll" resultMap="CupStudentMap">
+        SELECT
+        <include refid="allColumns" />
+        FROM DEV_CUP_STUDENT
+    </select>
+    
+    <!-- 根据条件参数查询数据列表 -->
+    <select id="findCupStudentByCondition" resultMap="CupStudentMap" parameterType="map">
+        SELECT
+        <include refid="allColumns" />
+        FROM DEV_CUP_STUDENT WHERE 1 = 1
+        <if test="cupCode != null and cupCode != ''">
+            AND CUP_CODE LIKE CONCAT('%', #{cupCode}, '%')
+        </if>
+        <if test="name != null and name != ''">
+            AND NAME LIKE CONCAT('%', #{name}, '%')
+        </if>
+        <if test="sex != null">
+            AND SEX = #{sex}
+        </if>
+        <if test="birthday != null">
+            AND BIRTHDAY = #{birthday}
+        </if>
+        <if test="height != null">
+            AND HEIGHT = #{height}
+        </if>
+        <if test="weight != null">
+            AND WEIGHT = #{weight}
+        </if>
+        <if test="createBy != null">
+            AND CREATE_BY = #{createBy}
+        </if>
+        <if test="createDate != null">
+            AND CREATE_DATE = #{createDate}
+        </if>
+        <if test="updateBy != null">
+            AND UPDATE_BY = #{updateBy}
+        </if>
+        <if test="updateDate != null">
+            AND UPDATE_DATE = #{updateDate}
+        </if>
+        <if test="remarks != null and remarks != ''">
+            AND REMARKS LIKE CONCAT('%', #{remarks}, '%')
+        </if>
+        <if test="delFlag != null">
+            AND DEL_FLAG = #{delFlag}
+        </if>
+    </select>
+    
+    <!-- 根据主键查询数据 -->
+    <select id="findCupStudentByIds" resultMap="CupStudentMap" parameterType="list">
+        SELECT
+        <include refid="allColumns" />
+        FROM DEV_CUP_STUDENT WHERE ID IN
+        <foreach collection="list" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+    
+    <!-- 插入数据 -->
+    <insert id="insertCupStudent" parameterType="map">
+        INSERT INTO DEV_CUP_STUDENT (
+            ID, CUP_CODE, NAME, SEX, BIRTHDAY, HEIGHT, WEIGHT, CREATE_BY, 
+            CREATE_DATE, UPDATE_BY, UPDATE_DATE, REMARKS, DEL_FLAG
+        ) VALUES (
+            #{id},
+            #{cupCode},
+            #{name},
+            #{sex},
+            #{birthday},
+            #{height},
+            #{weight},
+            #{createBy},
+            #{createDate},
+            #{updateBy},
+            #{updateDate},
+            #{remarks},
+            #{delFlag}
+        )
+    </insert>
+    
+    <!-- 批量插入数据 -->
+    <insert id="insertCupStudents" parameterType="list">
+        INSERT INTO DEV_CUP_STUDENT (
+            ID, CUP_CODE, NAME, SEX, BIRTHDAY, HEIGHT, WEIGHT, CREATE_BY, 
+            CREATE_DATE, UPDATE_BY, UPDATE_DATE, REMARKS, DEL_FLAG
+        ) VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (
+                #{item.id},
+                #{item.cupCode},
+                #{item.name},
+                #{item.sex},
+                #{item.birthday},
+                #{item.height},
+                #{item.weight},
+                #{item.createBy},
+                #{item.createDate},
+                #{item.updateBy},
+                #{item.updateDate},
+                #{item.remarks},
+                #{item.delFlag}
+            )
+        </foreach>
+    </insert>
+    
+    <!-- 修改数据 -->
+    <update id="updateCupStudent" parameterType="map">
+        UPDATE DEV_CUP_STUDENT
+        <set>
+            <if test="cupCode != null">
+                CUP_CODE = #{cupCode},
+            </if>
+            <if test="name != null">
+                NAME = #{name},
+            </if>
+            <if test="sex != null">
+                SEX = #{sex},
+            </if>
+            <if test="birthday != null">
+                BIRTHDAY = #{birthday},
+            </if>
+            <if test="height != null">
+                HEIGHT = #{height},
+            </if>
+            <if test="weight != null">
+                WEIGHT = #{weight},
+            </if>
+            <if test="createBy != null">
+                CREATE_BY = #{createBy},
+            </if>
+            <if test="createDate != null">
+                CREATE_DATE = #{createDate},
+            </if>
+            <if test="updateBy != null">
+                UPDATE_BY = #{updateBy},
+            </if>
+            <if test="updateDate != null">
+                UPDATE_DATE = #{updateDate},
+            </if>
+            <if test="remarks != null">
+                REMARKS = #{remarks},
+            </if>
+            <if test="delFlag != null">
+                DEL_FLAG = #{delFlag}
+            </if>
+        </set>
+        WHERE ID = #{id}
+    </update>
+    
+    <!-- 批量修改数据 -->
+    <update id="updateCupStudents" parameterType="list">
+        <foreach collection="list" index="index" item="item" separator=";">
+            UPDATE DEV_CUP_STUDENT
+            <set>
+                <if test="item.cupCode != null">
+                    CUP_CODE = #{item.cupCode},
+                </if>
+                <if test="item.name != null">
+                    NAME = #{item.name},
+                </if>
+                <if test="item.sex != null">
+                    SEX = #{item.sex},
+                </if>
+                <if test="item.birthday != null">
+                    BIRTHDAY = #{item.birthday},
+                </if>
+                <if test="item.height != null">
+                    HEIGHT = #{item.height},
+                </if>
+                <if test="item.weight != null">
+                    WEIGHT = #{item.weight},
+                </if>
+                <if test="item.createBy != null">
+                    CREATE_BY = #{item.createBy},
+                </if>
+                <if test="item.createDate != null">
+                    CREATE_DATE = #{item.createDate},
+                </if>
+                <if test="item.updateBy != null">
+                    UPDATE_BY = #{item.updateBy},
+                </if>
+                <if test="item.updateDate != null">
+                    UPDATE_DATE = #{item.updateDate},
+                </if>
+                <if test="item.remarks != null">
+                    REMARKS = #{item.remarks},
+                </if>
+                <if test="item.delFlag != null">
+                    DEL_FLAG = #{item.delFlag}
+                </if>
+            </set>
+            WHERE ID = #{item.id}
+        </foreach>
+    </update>
+    
+    <!-- 根据主键删除数据 -->
+    <delete id="deleteCupStudentById" parameterType="long">
+        DELETE FROM DEV_CUP_STUDENT WHERE ID = #{id}
+    </delete>
+    
+    <!-- 根据主键批量删除数据 -->
+    <delete id="deleteCupStudentByIds" parameterType="list">
+        DELETE FROM DEV_CUP_STUDENT WHERE ID IN
+        <foreach collection="list" index="index" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mysiteforme.admin.sysuser.dao.DictTypeDao" >
+    <!-- 这儿定义一个resultMap -->
+
+    <resultMap type="com.mysiteforme.admin.sysuser.entity.DictType" id="DictType">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="type" column="type"/>
+        <collection property="dicts"  ofType="com.mysiteforme.admin.sysuser.entity.Dict">
+            <result property="id" column="dict.id"/>
+            <result property="type" column="dict.type"/>
+            <result property="value" column="dict.value"/>
+            <result property="label" column="dict.label"/>
+            <result property="description" column="dict.description"/>
+            <result property="sort" column="dict.sort"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectListByMap" resultMap="DictType" parameterType="java.util.Map">
+        select
+        sdt.id,
+        sdt.name,
+        sdt.type,
+        sd.id     		AS 	"dict.id",
+        sd.type			AS	"dict.type",
+        sd.value 		AS 	"dict.value",
+        sd.label		AS	"dict.label",
+        sd.description	AS 	"dict.description",
+        sd.sort      	AS 	"dict.sort"
+        from
+        sys_dict_type sdt
+        left join sys_dict  sd  	on  	sd.type = sdt.type
+        where
+        1 = 1
+        <if test="type != null and type !=''">
+            and sdt.type LIKE '%#{type}%'
+        </if>
+        <if test="name !=null and name !=''">
+            and (
+            sdt.name 	LIKE '%#{name}%'
+            or sd.label 	LIKE '%#{name}%'
+            )
+        </if>
+        order by type desc
+    </select>
+
+
+
+    <!--<insert id="saveRoleMenus">-->
+    <!--insert into sys_role_menu(role_id,menu_id)-->
+    <!--values-->
+    <!--<foreach collection="menus" item="m" index="index" separator="," >-->
+    <!--(#{roleId},#{m.id})-->
+    <!--</foreach>-->
+    <!--</insert>-->
+
+    <delete id="deleteById" parameterType="java.lang.Long">
+        <![CDATA[
+        delete from sys_dict_type where id = #{id}
+        ]]>
+    </delete>
+
+    <!--<delete id="dropRoleUsers" parameterType="java.lang.Long">-->
+    <!--delete from sys_user_role where role_id = #{roleId}-->
+    <!--</delete>-->
+</mapper>
